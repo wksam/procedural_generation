@@ -5,10 +5,9 @@ using UnityEngine.UI;
 public class PerlinNoise : MonoBehaviour
 {
     public GameObject square;
-    int width;
-    int height;
-    GameObject[,] tiles;
-    public Button btnChange;
+    private int width;
+    private int height;
+    private GameObject[,] tiles;
 
     public float Scale { get; set; }
 
@@ -16,28 +15,38 @@ public class PerlinNoise : MonoBehaviour
     public int SeedY { get; set; }
 
     public float WaterPercentage { get; set; }
+    public bool WaterIsLocked { get; set; }
     public float SandPercentage { get; set; }
+    public bool SandIsLocked { get; set; }
     public float GrassPercentage { get; set; }
+    public bool GrassIsLocked { get; set; }
     public float ForestPercentage { get; set; }
+    public bool ForestIsLocked { get; set; }
     public float MountainPercentage { get; set; }
+    public bool MountainIsLocked { get; set; }
 
     private void Awake()
     {
+        // Solve the problem with dot/comma from float when tried convert to string
+        System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
         Scale = 0.1f;
         SeedX = 499999;
         SeedY = 499999;
         WaterPercentage = 0.2f;
+        WaterIsLocked = false;
         SandPercentage = 0.1f;
+        SandIsLocked = false;
         GrassPercentage = 0.3f;
+        GrassIsLocked = false;
         ForestPercentage = 0.2f;
+        ForestIsLocked = false;
         MountainPercentage = 0.2f;
+        MountainIsLocked = false;
     }
 
     void Start()
     {
-        Button btn = btnChange.GetComponent<Button>();
-        btn.onClick.AddListener(GenerateMap);
-
         Vector2 screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
         width = Mathf.CeilToInt(screenBounds.x);
         height = Mathf.CeilToInt(screenBounds.y);
@@ -62,10 +71,6 @@ public class PerlinNoise : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            GenerateMap();
-        }
         if (Input.GetKeyDown(KeyCode.W))
         {
             SeedY += 1;
@@ -94,13 +99,16 @@ public class PerlinNoise : MonoBehaviour
         {
             for (int j = 0; j < (height * 2) + 1; j++)
             {
-                tiles[i, j].GetComponent<SpriteRenderer>().color = GetColor(Mathf.PerlinNoise((i * Scale) + SeedX, (j * Scale) + SeedY));
+                tiles[i, j].GetComponent<SpriteRenderer>().material.color = GetColor(Mathf.PerlinNoise((i * Scale) + SeedX, (j * Scale) + SeedY), true);
             }
         }
     }
 
     Color GetColor(float noise, bool grayscale = false)
     {
+        if (noise > 1) noise = 1;
+        if (noise < 0) noise = 0;
+
         float wp = WaterPercentage;
         float sp = wp + SandPercentage;
         float gp = sp + GrassPercentage;

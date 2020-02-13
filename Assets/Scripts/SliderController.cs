@@ -5,88 +5,52 @@ using UnityEngine.UI;
 
 public class SliderController : MonoBehaviour
 {
-    PerlinNoise gameManager;
+    private UIController controller;
+
     private Slider slider;
     private Text percentage;
+    private Toggle toggle;
 
-    private void Start()
+    private void Awake()
     {
-        gameManager = GameObject.Find("GameManager").GetComponent<PerlinNoise>();
+        controller = GameObject.Find("GameManager").GetComponent<UIController>();
 
         slider = transform.Find("Slider").GetComponent<Slider>();
+        slider.onValueChanged.AddListener(delegate { OnSliderValueChanged(slider.value); });
+
+        toggle = transform.Find("Toggle").GetComponent<Toggle>();
+        toggle.onValueChanged.AddListener(delegate { OnToggleValueChanged(toggle.isOn); });
+
         percentage = transform.Find("Percentage").GetComponent<Text>();
-        
-        slider.value = GetValue();
-        percentage.text = (GetValue() * 100) + "%";
     }
 
-    public void OnValueChanged()
+    private void OnSliderValueChanged(float value)
     {
-        percentage.text = (float)System.Math.Round(slider.value * 100, 2) + "%";
-        SetValue(slider.value);
+        percentage.text = (value * 100) + "%";
     }
 
-    private void UpdateValues()
+    private void OnToggleValueChanged(bool value)
     {
-        slider.value = GetValue();
-        percentage.text = (GetValue() * 100) + "%";
+
     }
 
-    private string GetNextSiblingName(string currentName)
+    public float GetSliderValue()
     {
-        switch (currentName)
-        {
-            case "WaterSlider":
-                return "SandSlider";
-            case "SandSlider":
-                return "GrassSlider";
-            case "GrassSlider":
-                return "ForestSlider";
-            case "ForestSlider":
-                return "MountainSlider";
-            case "MountainSlider":
-            default:
-                return "WaterSlider";
-        }
+        return slider.value;
     }
 
-    private float GetValue()
+    public void SetSliderValue(float value)
     {
-        switch (name)
-        {
-            case "WaterSlider":
-                return gameManager.WaterPercentage;
-            case "SandSlider":
-                return gameManager.SandPercentage;
-            case "GrassSlider":
-                return gameManager.GrassPercentage;
-            case "ForestSlider":
-                return gameManager.ForestPercentage;
-            case "MountainSlider":
-            default:
-                return gameManager.MountainPercentage;
-        }
+        slider.value = value;
     }
 
-    private void SetValue(float value)
+    public bool GetToggleValue()
     {
-        switch (name)
-        {
-            case "WaterSlider":
-                gameManager.WaterPercentage = value;
-                break;
-            case "SandSlider":
-                gameManager.SandPercentage = value;
-                break;
-            case "GrassSlider":
-                gameManager.GrassPercentage = value;
-                break;
-            case "ForestSlider":
-                gameManager.ForestPercentage = value;
-                break;
-            case "MountainSlider":
-                gameManager.MountainPercentage = value;
-                break;
-        }
+        return toggle.isOn;
+    }
+
+    public void SetToggleValue(bool value)
+    {
+        toggle.isOn = value;
     }
 }

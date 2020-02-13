@@ -12,14 +12,27 @@ public class SeedController : MonoBehaviour
     {
         gameManager = GameObject.Find("GameManager").GetComponent<PerlinNoise>();
         input = GetComponent<InputField>();
+        UpdateUI();
+    }
 
-        if (name.Contains("X"))
+    public void OnEndEdit(string value)
+    {
+
+    }
+
+    public void UpdateUI() => input.text = Value.ToString();
+
+    private float Value => name.ToLower().Contains("x") ? gameManager.SeedX : gameManager.SeedY;
+
+    private void SetValue(int value)
+    {
+        if (name.ToLower().Contains("x"))
         {
-            input.text = gameManager.SeedX.ToString();
+            gameManager.SeedX = value;
         }
         else
         {
-            input.text = gameManager.SeedY.ToString();
+            gameManager.SeedY = value;
         }
     }
 

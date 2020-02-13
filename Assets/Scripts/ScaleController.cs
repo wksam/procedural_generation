@@ -12,6 +12,18 @@ public class ScaleController : MonoBehaviour
     {
         gameManager = GameObject.Find("GameManager").GetComponent<PerlinNoise>();
         input = GetComponent<InputField>();
-        input.text = gameManager.Scale.ToString();
+        input.onEndEdit.AddListener(delegate { OnEndEdit(input.text); });
+        UpdateUI();
     }
+
+    public void OnEndEdit(string value)
+    {
+        SetValue(float.Parse(value));
+    }
+
+    public void UpdateUI() => input.text = Value.ToString();
+
+    private float Value => gameManager.Scale;
+
+    private void SetValue(float value) => gameManager.Scale = value;
 }
